@@ -1,0 +1,55 @@
+; Definition of the neural net
+;
+[ Net ]
+MajVersion = 2
+MinVersion = 3
+NumLayers = 2
+InpLayer = 1
+OutLayer = 2
+Precision = Double ; ID = 8
+
+; Definition of layer 1
+;
+[ Layer(1) ]
+NumUnits = 1
+InpFunc = Sum_1 ; ID = 40
+ActFunc = Identity ; ID = 1
+OutFunc = Linear ; ID = 11
+ActSlope = 1
+ActThres = 0
+
+; Definition of layer 2
+;
+[ Layer(2) ]
+NumUnits = 1
+InpFunc = Sum_1 ; ID = 40
+ActFunc = Sigmoid_1 ; ID = 20
+OutFunc = Identity ; ID = 1
+ActSlope = 1
+ActThres = 0
+
+; Definition of unit 1 of layer 1
+;
+[ Unit(1,1) ]
+NumConns = 0
+InpBias = 0
+InpScale = 1
+OutBias = -0.02236024845
+OutScale = 0.01242236025
+
+[ Unit(2,1) ]
+NumConns = 1
+InpBias = -0.487265
+InpScale = 1
+OutBias = 0
+OutScale = 1
+; Definition of the incoming connections:
+; Form:
+; 	C(iC) = iL, iU, fW
+; with
+; 	iC: Connection index (1...6)
+; 	iL: Source layer index
+; 	iU: Source unit index
+; 	fW: Weight or RBF centre point co-ordinate value
+;
+C(1) = 1,1, -1.841538

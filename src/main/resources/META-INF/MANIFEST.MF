@@ -1,0 +1,6 @@
+Specification-Title: Java Neural Net Processing Library
+Specification-Version: 1.0
+Specification-Vendor: Brockmann Consult
+Implementation-Title: com.bc.jnn
+Implementation-Version: 1.5
+Implementation-Vendor: Brockmann Consult
