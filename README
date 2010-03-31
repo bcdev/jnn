@@ -1,3 +1,3 @@
 JNN is a Java library for neural network processing.
-The module also defines a neural network exchange format,
-JNA used to read and write neural networks.
+The module also defines a neural network exchange format "NNA",
+a plain text format used to read and write neural networks.
