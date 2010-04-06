@@ -20,6 +20,7 @@ import junit.framework.TestSuite;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 
 public class JnnNetTest extends TestCase {
 
@@ -293,9 +294,19 @@ public class JnnNetTest extends TestCase {
         double[] expOut = {-4.72434, -4.35721, -3.91311, -3.81949, -3.64676, -4.31995, -4.70068, -5.32911};
         double[] output = new double[expOut.length];
 
-        final JnnNet net = Jnn.readNna(_schillerNetFile_1);
+        JnnNet net = Jnn.readNna(_schillerNetFile_1);
         assertNotNull(net);
 
+        net.process(input, output);
+
+        for (int i = 0; i < expOut.length; i++) {
+            assertEquals(expOut[i], output[i], 1e-5);
+        }
+
+        // Test that a cloned net works as well
+        net = net.clone();
+
+        Arrays.fill(output, 0.0);
         net.process(input, output);
 
         for (int i = 0; i < expOut.length; i++) {
