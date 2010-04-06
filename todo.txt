@@ -1,1 +1,1 @@
-- Make the library thread-save, and/or implement the clone method. (nf, 31.03.2010)
+
