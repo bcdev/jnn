@@ -5,6 +5,8 @@ import com.bc.jnn.func.JnnFunctionFactory;
 import com.bc.jnn.func.IActivationFunction;
 import com.bc.jnn.func.IOutputFunction;
 
+import java.text.MessageFormat;
+
 /**
  * Created by IntelliJ IDEA.
  * User: tom
@@ -12,29 +14,29 @@ import com.bc.jnn.func.IOutputFunction;
  * Time: 15:20:38
  * To change this template use Options | File Templates.
  */
-public final class JnnLayer {
+public final class JnnLayer implements Cloneable {
 
-    private int _numUnits;
-    private int _inpFuncID;
-    private int _actFuncID;
-    private int _outFuncID;
-    private double[] _actParams;
-    private JnnUnit[] _units;
-    private IInputFunction _inpFunction;
-    private IActivationFunction _actFunction;
-    private IOutputFunction _outFunction;
+    private int numUnits;
+    private int inpFuncID;
+    private int actFuncID;
+    private int outFuncID;
+    private double[] actParams;
+    private JnnUnit[] units;
+    private IInputFunction inpFunction;
+    private IActivationFunction actFunction;
+    private IOutputFunction outFunction;
 
     /**
      * Constructs the object with default parameters.
      */
     public JnnLayer() {
-        _numUnits = 1;
-        _inpFuncID = JnnConstants.NN_FUNC_SUM_1;
-        _actFuncID = JnnConstants.NN_FUNC_SIGMOID_1;
-        _outFuncID = JnnConstants.NN_FUNC_IDENTITY;
-        _actParams = new double[2];
-        _actParams[0] = 0.0;
-        _actParams[1] = 1.0;
+        numUnits = 1;
+        inpFuncID = JnnConstants.NN_FUNC_SUM_1;
+        actFuncID = JnnConstants.NN_FUNC_SIGMOID_1;
+        outFuncID = JnnConstants.NN_FUNC_IDENTITY;
+        actParams = new double[2];
+        actParams[0] = 0.0;
+        actParams[1] = 1.0;
     }
 
     /**
@@ -42,7 +44,7 @@ public final class JnnLayer {
      * @return
      */
     public int getNumUnits() {
-        return _numUnits;
+        return numUnits;
     }
 
     /**
@@ -50,8 +52,8 @@ public final class JnnLayer {
      * @param numUnits
      */
     public void setNumUnits(int numUnits) {
-        _units = new JnnUnit[numUnits];
-        _numUnits = numUnits;
+        units = new JnnUnit[numUnits];
+        this.numUnits = numUnits;
     }
 
     /**
@@ -60,7 +62,7 @@ public final class JnnLayer {
      * @param unit
      */
     public void setUnitAt(int index, JnnUnit unit) {
-        _units[index] = unit;
+        units[index] = unit;
     }
 
     /**
@@ -69,7 +71,7 @@ public final class JnnLayer {
      * @return
      */
     public JnnUnit getUnitAt(int index) {
-        return _units[index];
+        return units[index];
     }
 
     /**
@@ -77,7 +79,7 @@ public final class JnnLayer {
      * @return
      */
     public int getInputFunction() {
-        return _inpFuncID;
+        return inpFuncID;
     }
 
     /**
@@ -85,7 +87,7 @@ public final class JnnLayer {
      * @param inpFunc
      */
     public void setInputFunction(int inpFunc) {
-        _inpFuncID = inpFunc;
+        inpFuncID = inpFunc;
     }
 
     /**
@@ -93,7 +95,7 @@ public final class JnnLayer {
      * @return
      */
     public int getActivationFunction() {
-        return _actFuncID;
+        return actFuncID;
     }
 
     /**
@@ -101,7 +103,7 @@ public final class JnnLayer {
      * @param actFunc
      */
     public void setActivationFunction(int actFunc) {
-        _actFuncID = actFunc;
+        actFuncID = actFunc;
     }
 
     /**
@@ -109,7 +111,7 @@ public final class JnnLayer {
      * @return
      */
     public int getOutputFunction() {
-        return _outFuncID;
+        return outFuncID;
     }
 
     /**
@@ -117,7 +119,7 @@ public final class JnnLayer {
      * @param outFunc
      */
     public void setOutputFunction(int outFunc) {
-        _outFuncID = outFunc;
+        outFuncID = outFunc;
     }
 
     /**
@@ -125,7 +127,7 @@ public final class JnnLayer {
      * @return
      */
     public double getActivationThreshold() {
-        return _actParams[0];
+        return actParams[0];
     }
 
     /**
@@ -133,7 +135,7 @@ public final class JnnLayer {
      * @param thresh
      */
     public void setActivationThreshold(double thresh) {
-        _actParams[0] = thresh;
+        actParams[0] = thresh;
     }
 
     /**
@@ -141,7 +143,7 @@ public final class JnnLayer {
      * @return
      */
     public double getActivationSlope() {
-        return _actParams[1];
+        return actParams[1];
     }
 
     /**
@@ -149,7 +151,7 @@ public final class JnnLayer {
      * @param slope
      */
     public void setActivationSlope(double slope) {
-        _actParams[1] = slope;
+        actParams[1] = slope;
     }
 
     /**
@@ -167,28 +169,28 @@ public final class JnnLayer {
      * @return true, if the layers's integrity is guranteed
      */
     public boolean initFunctions(boolean optimizing, StringBuffer msg) {
-        if (_numUnits < 1) {
-            msg.append("Invalid number of units: '" + _numUnits + "' (should be > 0)");
+        if (numUnits < 1) {
+            msg.append("Invalid number of units: '" + numUnits + "' (should be > 0)");
             return false;
         }
 
-        if (_units == null) {
+        if (units == null) {
             msg.append("No units defined");
             return false;
         }
 
-        switch (_inpFuncID) {
+        switch (inpFuncID) {
         case JnnConstants.NN_FUNC_ZERO:
         case JnnConstants.NN_FUNC_SUM_1:
         case JnnConstants.NN_FUNC_SUM_2:
-            _inpFunction = JnnFunctionFactory.getInputFunction(_inpFuncID, optimizing);
+            inpFunction = JnnFunctionFactory.getInputFunction(inpFuncID, optimizing);
             break;
         default:
-            msg.append("Invalid input function ID '" + _inpFuncID + "'");
+            msg.append("Invalid input function ID '" + inpFuncID + "'");
             return false;
         }
 
-        switch (_actFuncID) {
+        switch (actFuncID) {
         case JnnConstants.NN_FUNC_IDENTITY:
         case JnnConstants.NN_FUNC_THRESHOLD:
         case JnnConstants.NN_FUNC_SEMILINEAR:
@@ -198,33 +200,33 @@ public final class JnnLayer {
         case JnnConstants.NN_FUNC_TANG_SIGMOID:
         case JnnConstants.NN_FUNC_RBF_1:
         case JnnConstants.NN_FUNC_RBF_2:
-            _actFunction = JnnFunctionFactory.getActivationFunction(_actFuncID, optimizing);
-            _actFunction.setParameter(_actParams);
+            actFunction = JnnFunctionFactory.getActivationFunction(actFuncID, optimizing);
+            actFunction.setParameter(actParams);
             break;
         default:
-            msg.append("Invalid activation function ID '" + _actFuncID + "'");
+            msg.append("Invalid activation function ID '" + actFuncID + "'");
             return false;
         }
 
-        switch (_outFuncID) {
+        switch (outFuncID) {
         case JnnConstants.NN_FUNC_IDENTITY:
         case JnnConstants.NN_FUNC_LINEAR:
         case JnnConstants.NN_FUNC_EXPONENTIAL:
         case JnnConstants.NN_FUNC_LOGARITHMIC:
-            _outFunction = JnnFunctionFactory.getOutputFunction(_outFuncID, optimizing);
+            outFunction = JnnFunctionFactory.getOutputFunction(outFuncID, optimizing);
             break;
         default:
-            msg.append("Invalid output function ID '" + _outFuncID + "'");
+            msg.append(MessageFormat.format("Invalid output function ID ''{0}''", outFuncID));
             return false;
         }
 
-        for (int i = 0; i < _units.length; i++) {
-            if (_units[i] != null) {
-                if (!_units[i].verifyIntegrity(msg)) {
+        for (int i = 0; i < units.length; i++) {
+            if (units[i] != null) {
+                if (!units[i].verifyIntegrity(msg)) {
                     return false;
                 }
             } else {
-                msg.append("No unit at 0-based index: '" + i + "'");
+                msg.append(MessageFormat.format("No unit at 0-based index: ''{0}''", i));
                 return false;
             }
         }
@@ -235,8 +237,8 @@ public final class JnnLayer {
      * Calculated the input function on the units connected
      */
     public void calcInputFunction() {
-        for (int i = 0; i < _numUnits; i++) {
-            _inpFunction.evaluate(_units[i]);
+        for (int i = 0; i < numUnits; i++) {
+            inpFunction.evaluate(units[i]);
         }
     }
 
@@ -244,8 +246,8 @@ public final class JnnLayer {
      * Calculates the activation function on the units attached
      */
     public void calcActivationFunction() {
-        for (int i = 0; i < _numUnits; i++) {
-            _actFunction.evaluate(_units[i]);
+        for (int i = 0; i < numUnits; i++) {
+            actFunction.evaluate(units[i]);
         }
     }
 
@@ -253,8 +255,8 @@ public final class JnnLayer {
      * Calculated the output function on the units connected
      */
     public void calcOutputFunction() {
-        for (int i = 0; i < _numUnits; i++) {
-            _outFunction.evaluate(_units[i]);
+        for (int i = 0; i < numUnits; i++) {
+            outFunction.evaluate(units[i]);
         }
     }
 
@@ -264,16 +266,15 @@ public final class JnnLayer {
      * @param input
      */
     public void setInputData(double[] input) {
-        if (input.length != _numUnits) {
-            throw new IllegalArgumentException("Invalid number of input data '" + input.length
-                                               + "' expected '" + _numUnits + "'");
+        if (input.length != numUnits) {
+            throw new IllegalArgumentException(MessageFormat.format("Invalid number of input data ''{0}'' expected ''{1}''", input.length, numUnits));
         }
 
         double temp;
-        for (int i = 0; i < _numUnits; i++) {
-            temp = _units[i].getInput();
+        for (int i = 0; i < numUnits; i++) {
+            temp = units[i].getInput();
             temp += input[i];
-            _units[i].setInput(temp);
+            units[i].setInput(temp);
         }
     }
 
@@ -283,13 +284,28 @@ public final class JnnLayer {
      * @param out
      */
     public double[] getOutputData(double[] out) {
-        if (out.length != _numUnits) {
-            throw new IllegalArgumentException("Invalid number of output data '" + out.length
-                                               + "' expected '" + _numUnits + "'");
+        if (out.length != numUnits) {
+            throw new IllegalArgumentException(MessageFormat.format("Invalid number of output data ''{0}'' expected ''{1}''", out.length, numUnits));
         }
-        for (int i = 0; i < _numUnits; i++) {
-            out[i] = _units[i].getOutput();
+        for (int i = 0; i < numUnits; i++) {
+            out[i] = units[i].getOutput();
         }
         return out;
+    }
+
+    @Override
+    public JnnLayer clone() {
+        try {
+            JnnLayer clonedLayer = (JnnLayer) super.clone();
+            JnnUnit[] clonedUnits = units.clone();
+            for (int i = 0; i < clonedUnits.length; i++) {
+                clonedUnits[i] = clonedUnits[i].clone();
+            }
+            clonedLayer.units = clonedUnits;
+            clonedLayer.actParams = actParams.clone();
+            return clonedLayer;
+        } catch (CloneNotSupportedException e) {
+            throw new IllegalStateException(e);
+        }
     }
 }

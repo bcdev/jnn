@@ -16,29 +16,31 @@
  */
 package com.bc.jnn;
 
-public final class JnnUnit {
+import java.text.MessageFormat;
 
-    private int _numConns;
-    private double _input;
-    private double _activation;
-    private double _output;
-    private double _inpScale;
-    private double _inpBias;
-    private double _outScale;
-    private double _outBias;
+public final class JnnUnit implements Cloneable {
 
-    private JnnConnection[] _connections;
+    private int numConns;
+    private double input;
+    private double activation;
+    private double output;
+    private double inpScale;
+    private double inpBias;
+    private double outScale;
+    private double outBias;
+
+    private JnnConnection[] connections;
 
     /**
      * Constructs the object with default parameters.
      */
     public JnnUnit() {
-        _numConns = 0;
-        _input = 0.0;
-        _inpScale = 1.0;
-        _inpBias = 0.0;
-        _outScale = 1.0;
-        _outBias = 0.0;
+        numConns = 0;
+        input = 0.0;
+        inpScale = 1.0;
+        inpBias = 0.0;
+        outScale = 1.0;
+        outBias = 0.0;
     }
 
     /**
@@ -46,7 +48,7 @@ public final class JnnUnit {
      * @return
      */
     public int getNumConnections() {
-        return _numConns;
+        return numConns;
     }
 
     /**
@@ -54,9 +56,9 @@ public final class JnnUnit {
      * @param numConns
      */
     public void setNumConnections(int numConns) {
-        _numConns = numConns;
-        if (_connections == null || numConns != _connections.length) {
-            _connections = new JnnConnection[numConns];
+        this.numConns = numConns;
+        if (connections == null || numConns != connections.length) {
+            connections = new JnnConnection[numConns];
         }
     }
 
@@ -65,7 +67,7 @@ public final class JnnUnit {
      * @return
      */
     public double getInputScale() {
-        return _inpScale;
+        return inpScale;
     }
 
     /**
@@ -73,7 +75,7 @@ public final class JnnUnit {
      * @param inpScale
      */
     public void setInputScale(double inpScale) {
-        _inpScale = inpScale;
+        this.inpScale = inpScale;
     }
 
     /**
@@ -81,7 +83,7 @@ public final class JnnUnit {
      * @return
      */
     public double getInputBias() {
-        return _inpBias;
+        return inpBias;
     }
 
     /**
@@ -89,7 +91,7 @@ public final class JnnUnit {
      * @param inpBias
      */
     public void setInputBias(double inpBias) {
-        _inpBias = inpBias;
+        this.inpBias = inpBias;
     }
 
     /**
@@ -97,7 +99,7 @@ public final class JnnUnit {
      * @return
      */
     public double getOutputScale() {
-        return _outScale;
+        return outScale;
     }
 
     /**
@@ -105,7 +107,7 @@ public final class JnnUnit {
      * @param outScale
      */
     public void setOutputScale(double outScale) {
-        _outScale = outScale;
+        this.outScale = outScale;
     }
 
     /**
@@ -113,7 +115,7 @@ public final class JnnUnit {
      * @return
      */
     public double getOutputBias() {
-        return _outBias;
+        return outBias;
     }
 
     /**
@@ -121,7 +123,7 @@ public final class JnnUnit {
      * @param outBias
      */
     public void setOutputBias(double outBias) {
-        _outBias = outBias;
+        this.outBias = outBias;
     }
 
     /**
@@ -129,7 +131,7 @@ public final class JnnUnit {
      * @return
      */
     public double getInput() {
-        return _input;
+        return input;
     }
 
     /**
@@ -137,7 +139,7 @@ public final class JnnUnit {
      * @param input
      */
     public void setInput(double input) {
-        _input = input;
+        this.input = input;
     }
 
     /**
@@ -145,7 +147,7 @@ public final class JnnUnit {
      * @return
      */
     public double getOutput() {
-        return _output;
+        return output;
     }
 
     /**
@@ -153,7 +155,7 @@ public final class JnnUnit {
      * @param activation
      */
     public void setActivation(double activation) {
-        _activation = activation;
+        this.activation = activation;
     }
 
     /**
@@ -161,7 +163,7 @@ public final class JnnUnit {
      * @return
      */
     public double getActivation() {
-        return _activation;
+        return activation;
     }
 
     /**
@@ -169,7 +171,7 @@ public final class JnnUnit {
      * @param output
      */
     public void setOutput(double output) {
-        _output = output;
+        this.output = output;
     }
 
     /**
@@ -178,7 +180,7 @@ public final class JnnUnit {
      * @param connection
      */
     public void setConnectionAt(int index, JnnConnection connection) {
-        _connections[index] = connection;
+        connections[index] = connection;
     }
 
     /**
@@ -187,7 +189,7 @@ public final class JnnUnit {
      * @return
      */
     public JnnConnection getConnectionAt(int index) {
-        return _connections[index];
+        return connections[index];
     }
 
     /**
@@ -203,21 +205,36 @@ public final class JnnUnit {
      * @return whether the check was successful or not
      */
     public boolean verifyIntegrity(StringBuffer msg) {
-        if (_numConns < 0) {
-            msg.append("Invalid number of connections '" + _numConns + "' (should be >= 0)");
+        if (numConns < 0) {
+            msg.append(MessageFormat.format("Invalid number of connections ''{0}'' (should be >= 0)", numConns));
             return false;
         }
-        if ((_numConns > 0) && (_connections == null)) {
+        if ((numConns > 0) && (connections == null)) {
             msg.append("No connections defined");
             return false;
         }
 
-        for (int i = 0; i < _numConns; i++) {
-            if (_connections[i] == null) {
-                msg.append("No connection at 0-based index: '" + i + "'");
+        for (int i = 0; i < numConns; i++) {
+            if (connections[i] == null) {
+                msg.append(MessageFormat.format("No connection at 0-based index: ''{0}''", i));
                 return false;
             }
         }
         return true;
+    }
+
+    @Override
+    public JnnUnit clone() {
+        try {
+            JnnUnit clonedUnit = (JnnUnit) super.clone();
+            JnnConnection[] clonedConnections = connections.clone();
+            for (int i = 0; i < clonedConnections.length; i++) {
+                clonedConnections[i] = clonedConnections[i].clone();
+            }
+            clonedUnit.connections = clonedConnections;
+            return clonedUnit;
+        } catch (CloneNotSupportedException e) {
+            throw new IllegalStateException(e);
+        }
     }
 }

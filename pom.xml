@@ -6,7 +6,7 @@
     <name>Java Neural Net Processing Library</name>
     <groupId>com.bc.jnn</groupId>
     <artifactId>jnn</artifactId>
-    <version>1.5</version>
+    <version>1.6-SNAPSHOT</version>
 
     <packaging>jar</packaging>
 

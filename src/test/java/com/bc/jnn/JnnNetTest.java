@@ -268,13 +268,20 @@ public class JnnNetTest extends TestCase {
      */
     public void testProcessNet() {
         double[] input = new double[]{1.0};
-        double[] output = new double[]{1.0};
+        double[] output = new double[1];
 
         setUpSimpleTwoLayerNet();
         assertEquals(true, _net.init());
 
         _net.process(input, output);
 
+        assertEquals(0.8, output[0], 1e-6);
+
+        // Test that a cloned net works as well
+        JnnNet net = _net.clone();
+
+        output[0] = 0.0;
+        net.process(input, output);
         assertEquals(0.8, output[0], 1e-6);
     }
 

@@ -12,18 +12,20 @@
  */
 package com.bc.jnn;
 
-public final class JnnNet {
+import java.text.MessageFormat;
+
+public final class JnnNet implements Cloneable {
 
     private int _versionMajor;
     private int _versionMinor;
 
-    private int _numLayers;
+    private int numLayers;
     private int _inputLayerIndex;
     private int _outputLayerIndex;
 
     private int _precision;
 
-    private JnnLayer[] _layers;
+    private JnnLayer[] layers;
 
     /**
      * Constructs the object with default parameters.
@@ -32,7 +34,7 @@ public final class JnnNet {
         _versionMajor = JnnConstants.NN_VERSION_MAJOR;
         _versionMinor = JnnConstants.NN_VERSION_MINOR;
 
-        _numLayers = 1;
+        numLayers = 1;
         _inputLayerIndex = JnnConstants.NN_NOT_SET;
         _outputLayerIndex = JnnConstants.NN_NOT_SET;
 
@@ -90,7 +92,7 @@ public final class JnnNet {
      * @return
      */
     public int getNumLayers() {
-        return _numLayers;
+        return numLayers;
     }
 
     /**
@@ -102,9 +104,9 @@ public final class JnnNet {
         if (numLayers < 0) {
             throw new IllegalArgumentException("invalid number of layers");
         }
-        _numLayers = numLayers;
-        if ((_layers == null) || (_layers.length != _numLayers)) {
-            _layers = new JnnLayer[_numLayers];
+        this.numLayers = numLayers;
+        if ((layers == null) || (layers.length != this.numLayers)) {
+            layers = new JnnLayer[this.numLayers];
         }
     }
 
@@ -174,7 +176,7 @@ public final class JnnNet {
      * @return
      */
     public JnnLayer getLayerAt(int index) {
-        return _layers[index];
+        return layers[index];
     }
 
     /**
@@ -184,7 +186,7 @@ public final class JnnNet {
      * @param layer the layer to add
      */
     public void setLayerAt(int index, JnnLayer layer) {
-        _layers[index] = layer;
+        layers[index] = layer;
     }
 
 
@@ -195,10 +197,7 @@ public final class JnnNet {
      */
     public boolean init() {
         StringBuffer msg = new StringBuffer(32);
-        if (!init(msg))  {
-            return false;
-        }
-        return true;
+        return init(false, msg);
     }
 
     /**
@@ -215,12 +214,12 @@ public final class JnnNet {
     /**
      * Initializes the neural net.
      *
-     * @param report a string buffer which collects the report of the performed integrity checks
+     * @param report     a string buffer which collects the report of the performed integrity checks
      * @param optimizing true, if initialization shall use optimization techiques
      * @return true, if initialisation was successful
      */
     public boolean init(boolean optimizing, StringBuffer report) {
-        return initLayerFunctions(optimizing, report) && verifyConnectionIntegrity(report);
+        return initLayerFunctions(optimizing, report) && initConnections(report);
     }
 
 
@@ -242,7 +241,7 @@ public final class JnnNet {
      * @deprecated use {@link #init(StringBuffer)} instead
      */
     public boolean verifyIntegrity(StringBuffer report) {
-        return init(report);
+        return init(false, report);
     }
 
     /**
@@ -253,8 +252,8 @@ public final class JnnNet {
      */
     public void process(double[] input, double[] output) {
         JnnLayer currentLayer;
-        for (int i = 0; i < _numLayers; i++) {
-            currentLayer = _layers[i];
+        for (int i = 0; i < numLayers; i++) {
+            currentLayer = layers[i];
             currentLayer.calcInputFunction();
             if ((_inputLayerIndex) == i) {
                 currentLayer.setInputData(input);
@@ -267,40 +266,61 @@ public final class JnnNet {
         }
     }
 
+    @Override
+    public JnnNet clone() {
+        try {
+            JnnNet clonedNet = (JnnNet) super.clone();
+            JnnLayer[] clonedLayers = layers.clone();
+            for (int i = 0; i < clonedLayers.length; i++) {
+                clonedLayers[i] = clonedLayers[i].clone();
+            }
+            clonedNet.layers = clonedLayers;
+            StringBuffer report = new StringBuffer();
+            if (!clonedNet.initConnections(report)) {
+                throw new IllegalStateException(report.toString());
+            }
+            return clonedNet;
+        } catch (CloneNotSupportedException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     /////// END OF PUBLIC
     ///////////////////////////////////////////////////////////////////////////
 
     /**
      * Initializes the input, activation and output functions of all layers and checks the integrity of the net.
-     * @return true, if the net's integrity is guranteed
+     *
      * @param optimizing true, if initialization shall use optimization techiques
+     * @param msg Buffer for collecting messages
+     * @return true, if the net's integrity is guranteed
      */
     private boolean initLayerFunctions(boolean optimizing, StringBuffer msg) {
-        if (_numLayers < 1) {
-            msg.append("invalid number of layers: '" + _numLayers + "' (should be > 0)");
+        if (numLayers < 1) {
+            msg.append(MessageFormat.format("invalid number of layers: ''{0}'' (should be > 0)", numLayers));
             return false;
         }
-        if (_layers == null) {
+        if (layers == null) {
             msg.append("no layers defined");
             return false;
         }
-        if (_inputLayerIndex < 0 || _inputLayerIndex >= _numLayers) {
-            msg.append("invalid input 0-based layer index: '" + _inputLayerIndex + "' (should be >= 0 and < " + _numLayers + ")");
+        if (_inputLayerIndex < 0 || _inputLayerIndex >= numLayers) {
+            msg.append(MessageFormat.format("invalid input 0-based layer index: ''{0}'' (should be >= 0 and < {1})", _inputLayerIndex, numLayers));
             return false;
         }
-        if (_outputLayerIndex < 0 || _outputLayerIndex >= _numLayers) {
-            msg.append("invalid output 0-based layer index: '" + _outputLayerIndex + "' (should be >= 0 and < " + _numLayers + ")");
+        if (_outputLayerIndex < 0 || _outputLayerIndex >= numLayers) {
+            msg.append(MessageFormat.format("invalid output 0-based layer index: ''{0}'' (should be >= 0 and < {1})", _outputLayerIndex, numLayers));
             return false;
         }
 
-        for (int i = 0; i < _layers.length; i++) {
-            if (_layers[i] != null) {
-                if (!_layers[i].initFunctions(optimizing, msg)) {
+        for (int i = 0; i < layers.length; i++) {
+            if (layers[i] != null) {
+                if (!layers[i].initFunctions(optimizing, msg)) {
                     return false;
                 }
             } else {
-                msg.append("no layer defined at 0-based index: '" + i + "'");
+                msg.append(MessageFormat.format("no layer defined at 0-based index: ''{0}''", i));
                 return false;
             }
         }
@@ -311,10 +331,11 @@ public final class JnnNet {
     /**
      * Checks that all connections defined in the net are valid.
      *
+     * @param msg Buffer for collecting messages
      * @return whether this is true or not
      */
-    private boolean verifyConnectionIntegrity(StringBuffer msg) {
-        // @todo - 2 tb/tb rename this method
+    private boolean initConnections(StringBuffer msg) {
+
         JnnLayer currentLayer;
         JnnLayer testLayer;
         JnnUnit currentUnit;
@@ -323,26 +344,26 @@ public final class JnnNet {
         int layerIndex;
         int unitIndex;
 
-        for (int i = 0; i < _layers.length; i++) {
-            currentLayer = _layers[i];
+        for (JnnLayer layer : layers) {
+            currentLayer = layer;
             for (int j = 0; j < currentLayer.getNumUnits(); j++) {
                 currentUnit = currentLayer.getUnitAt(j);
                 for (int k = 0; k < currentUnit.getNumConnections(); k++) {
                     currentConnection = currentUnit.getConnectionAt(k);
                     layerIndex = currentConnection.getSourceLayerIndex();
-                    if (layerIndex < 0 || layerIndex >= _numLayers) {
-                        msg.append("invalid 0-based connection source layer index: '" + layerIndex + "'");
+                    if (layerIndex < 0 || layerIndex >= numLayers) {
+                        msg.append(MessageFormat.format("invalid 0-based connection source layer index: ''{0}''", layerIndex));
                         return false;
                     }
-                    testLayer = _layers[layerIndex];
+                    testLayer = layers[layerIndex];
                     unitIndex = currentConnection.getSourceUnitIndex();
                     if (unitIndex < 0 || unitIndex >= testLayer.getNumUnits()) {
-                        msg.append("invalid 0-based connection source unit index: '" + unitIndex + "'");
+                        msg.append(MessageFormat.format("invalid 0-based connection source unit index: ''{0}''", unitIndex));
                         return false;
                     }
                     testUnit = testLayer.getUnitAt(unitIndex);
                     if (testUnit == null) {
-                        msg.append("invalid 0-based connection source unit index: '" + unitIndex + "'");
+                        msg.append(MessageFormat.format("invalid 0-based connection source unit index: ''{0}''", unitIndex));
                         return false;
                     }
                     currentConnection.setInputUnit(testUnit);

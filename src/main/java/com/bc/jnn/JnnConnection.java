@@ -16,12 +16,12 @@
  */
 package com.bc.jnn;
 
-public final class JnnConnection {
+public final class JnnConnection implements Cloneable {
 
-    private int _srcLayerIndex;
-    private int _srcUnitIndex;
-    private double _weight;
-    private JnnUnit _inUnit;
+    private int srcLayerIndex;
+    private int srcUnitIndex;
+    private double weight;
+    private JnnUnit inUnit;
 
     /**
      * Retrieves the (0-based) source layer index of the connection
@@ -29,7 +29,7 @@ public final class JnnConnection {
      * @return
      */
     public int getSourceLayerIndex() {
-        return _srcLayerIndex;
+        return srcLayerIndex;
     }
 
     /**
@@ -38,7 +38,7 @@ public final class JnnConnection {
      * @param index
      */
     public void setSourceLayerIndex(int index) {
-        _srcLayerIndex = index;
+        srcLayerIndex = index;
     }
 
     /**
@@ -47,7 +47,7 @@ public final class JnnConnection {
      * @return
      */
     public int getSourceUnitIndex() {
-        return _srcUnitIndex;
+        return srcUnitIndex;
     }
 
     /**
@@ -56,7 +56,7 @@ public final class JnnConnection {
      * @param index
      */
     public void setSourceUnitIndex(int index) {
-        _srcUnitIndex = index;
+        srcUnitIndex = index;
     }
 
     /**
@@ -65,7 +65,7 @@ public final class JnnConnection {
      * @return
      */
     public double getWeight() {
-        return _weight;
+        return weight;
     }
 
     /**
@@ -74,7 +74,7 @@ public final class JnnConnection {
      * @param weight
      */
     public void setWeight(double weight) {
-        _weight = weight;
+        this.weight = weight;
     }
 
     /**
@@ -83,13 +83,24 @@ public final class JnnConnection {
      * @param inUnit
      */
     public void setInputUnit(JnnUnit inUnit) {
-        _inUnit = inUnit;
+        this.inUnit = inUnit;
     }
 
     /**
      * Gets the input unit for this connection
      */
     public JnnUnit getInputUnit() {
-        return _inUnit;
+        return inUnit;
+    }
+
+    @Override
+    public JnnConnection clone() {
+        try {
+            JnnConnection clonedConnection = (JnnConnection) super.clone();
+            clonedConnection.inUnit = null;
+            return clonedConnection;
+        } catch (CloneNotSupportedException e) {
+            throw new IllegalStateException(e);
+        }
     }
 }
