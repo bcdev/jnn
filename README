@@ -4,6 +4,12 @@ a plain text format used to read and write neural networks.
 
 Changelog:
 
+From 1.6 to 1.7
+
+* Added support for NNs trained and formatted by Helmut Schiller.
+  Code is in package org.esa.beam.nn (todo: use Schiller's original packlage path).
+  
+  
 From 1.5 to 1.6
 
 * JNN is not thread-safe. So we made JnnNet and JnnLayer clonable. Client code can now instantiate
