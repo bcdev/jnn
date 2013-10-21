@@ -6,5 +6,5 @@ Changelog:
 
 From 1.5 to 1.6
 
-* JNN is not thread-safe. So we made JnnNet and JnnLayer clonable. Client code can now produce
-  local copies a net in order to run several net instances in parallel.
+* JNN is not thread-safe. So we made JnnNet and JnnLayer clonable. Client code can now instantiate
+  thread-local copies a net in order to run several net instances in parallel.
