@@ -35,6 +35,13 @@
     </distributionManagement>
 
 
+    <licenses>
+        <license>
+            <name>MIT</name>
+            <url>https://opensource.org/licenses/mit-license.php</url>
+        </license>
+    </licenses>
+    
     <build>
         <plugins>
             <plugin>
